@@ -1,0 +1,8 @@
+venv/
+build/
+dist/
+__pycache__/
+*.spec
+*.pyc
+noc_settings.json
+noc_scores.json
