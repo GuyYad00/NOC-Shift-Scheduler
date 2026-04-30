@@ -4,6 +4,8 @@
 
 The application pulls weekly availability and preferences from a public Google Sheet, runs a Mixed-Integer Linear Programming (MILP) solver to produce an optimal schedule, allows manual overrides, persists fairness scores across months, and exports the schedule to Excel or sends it via WhatsApp.
 
+**Authors:** [Guy Yad](https://github.com/GuyYad00) · [Eli Levy](https://github.com/Elilevy52)
+
 ---
 
 ## Table of Contents
@@ -20,6 +22,7 @@ The application pulls weekly availability and preferences from a public Google S
 - [Building the Standalone EXE](#building-the-standalone-exe)
 - [Usage Workflow](#usage-workflow)
 - [Tech Stack](#tech-stack)
+- [Authors](#authors)
 
 ---
 
@@ -309,3 +312,16 @@ What the script does:
 - **HTTP / parsing** — `requests`, `csv`
 - **Excel export** — `openpyxl`
 - **Packaging** — `PyInstaller` (one-file)
+
+---
+
+## Authors
+
+This project was built collaboratively by:
+
+| Author | GitHub |
+|---|---|
+| Guy Yad | [@GuyYad00](https://github.com/GuyYad00) |
+| Eli Levy | [@Elilevy52](https://github.com/Elilevy52) |
+
+Contributions, issues and feature requests are welcome — please open an issue or a pull request on the [repository](https://github.com/GuyYad00/NOC-Shift-Scheduler).
