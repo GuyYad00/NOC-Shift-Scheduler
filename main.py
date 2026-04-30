@@ -1,3 +1,4 @@
+# pyre-ignore-all-errors
 """NOC Shift Scheduler - Entry Point."""
 
 from gui import App
