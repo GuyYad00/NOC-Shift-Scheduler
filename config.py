@@ -6,12 +6,12 @@ from datetime import time
 SHIFT_TYPES = ["בוקר", "ערב", "לילה", "כונן"]
 REGULAR_SHIFTS = ["בוקר", "ערב", "לילה"]
 
-# ראשון–שלישי (אינדקסים 0,1,2): שני עובדים במשמרת בוקר; בשאר הימים בוקר יחיד
-DOUBLE_MORNING_DAY_INDICES = (0, 1, 2)
+# חזרה למתכונת של עובד אחד בכל משמרת (ללא ימי בוקר כפולים)
+DOUBLE_MORNING_DAY_INDICES: tuple[int, ...] = ()
 
 
 def slots_for_day_shift(day_index: int, shift_type: str) -> list[int]:
-    """מספר סלוטים לסוג משמרת ביום נתון (בוקר כפול בראשון–שלישי)."""
+    """מספר סלוטים לסוג משמרת ביום נתון."""
     if shift_type == "בוקר" and day_index in DOUBLE_MORNING_DAY_INDICES:
         return [0, 1]
     return [0]
@@ -30,6 +30,20 @@ def iter_all_slot_keys(num_days: int):
         for s in SHIFT_TYPES:
             for slot in slots_for_day_shift(d, s):
                 yield (d, s, slot)
+
+
+def schedule_row_defs() -> list[tuple[str, str, int]]:
+    """שורות תצוגה בטבלה ובייצוא. שורת בוקר ב מוצגת רק כשיש ימי בוקר כפולים."""
+    if DOUBLE_MORNING_DAY_INDICES:
+        rows: list[tuple[str, str, int]] = [
+            ("בוקר (א)", "בוקר", 0),
+            ("בוקר (ב)", "בוקר", 1),
+        ]
+    else:
+        rows = [(SHIFT_LABELS["בוקר"], "בוקר", 0)]
+    for shift_type in ("ערב", "לילה", "כונן"):
+        rows.append((SHIFT_LABELS[shift_type], shift_type, 0))
+    return rows
 
 # Time windows for shifts
 SHIFT_TIMES = {

@@ -106,26 +106,51 @@ def reset_all_historical_data():
     save_scores({})
 
 
-def load_settings() -> dict:
-    path = _settings_path()
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            settings = json.load(f)
-            if "min_shifts" not in settings:
-                settings["min_shifts"] = DEFAULT_MIN_SHIFTS
-            if "max_consecutive_days" not in settings:
-                settings["max_consecutive_days"] = DEFAULT_MAX_CONSECUTIVE_DAYS
-            return settings
-
+def _default_settings() -> dict:
     return {
         "sheet_url": "",
         "excluded_employees": [],
-        "last_saturday_shifts": {},
         "last_saturday_by_employee": {},
         "work_streaks": {},
         "min_shifts": DEFAULT_MIN_SHIFTS,
         "max_consecutive_days": DEFAULT_MAX_CONSECUTIVE_DAYS,
     }
+
+
+def _normalize_settings(settings: dict) -> tuple:
+    """Unify legacy last_saturday_shifts into last_saturday_by_employee."""
+    changed = False
+    if "min_shifts" not in settings:
+        settings["min_shifts"] = DEFAULT_MIN_SHIFTS
+        changed = True
+    if "max_consecutive_days" not in settings:
+        settings["max_consecutive_days"] = DEFAULT_MAX_CONSECUTIVE_DAYS
+        changed = True
+
+    by_emp = dict(settings.get("last_saturday_by_employee") or {})
+    legacy = settings.get("last_saturday_shifts") or {}
+    if legacy and not by_emp:
+        by_emp = {emp: s for s, emp in legacy.items() if emp}
+        changed = True
+    if settings.get("last_saturday_by_employee") != by_emp:
+        settings["last_saturday_by_employee"] = by_emp
+        changed = True
+    if "last_saturday_shifts" in settings:
+        settings.pop("last_saturday_shifts", None)
+        changed = True
+    return settings, changed
+
+
+def load_settings() -> dict:
+    path = _settings_path()
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+        settings, changed = _normalize_settings(settings)
+        if changed:
+            save_settings(settings)
+        return settings
+    return _default_settings()
 
 
 def save_settings(settings: dict):

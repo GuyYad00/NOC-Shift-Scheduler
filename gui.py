@@ -15,7 +15,7 @@ from config import (
     APP_TITLE, APP_WIDTH, APP_HEIGHT,
     SHIFT_TYPES,
     WHATSAPP_MSG_HEADER, COLOR_HEATMAP_EMPTY, COLOR_HEATMAP_LOW,
-    slots_for_day_shift, normalize_assignment_key,
+    slots_for_day_shift, normalize_assignment_key, schedule_row_defs,
 )
 from sheets_reader import fetch_and_parse
 from data_store import (
@@ -39,16 +39,6 @@ COLOR_UNFILLED = "#EF5350"    # Red
 COLOR_WARNING = "#FFA726"     # Orange
 COLOR_WHATSAPP = "#25D366"    # WhatsApp
 COLOR_CARD_BG = "#F5F5F7"     # Light Apple-style Gray for cards
-
-# שורות תצוגה: (תווית, סוג משמרת, מספר סלוט)
-SCHEDULE_ROW_DEFS = [
-    ("בוקר (א)", "בוקר", 0),
-    ("בוקר (ב)", "בוקר", 1),
-    ("ערב", "ערב", 0),
-    ("לילה", "לילה", 0),
-    ("כונן", "כונן", 0),
-]
-
 
 class StatsWindow(ctk.CTkToplevel):
     """Premium analytics window for historical data."""
@@ -436,7 +426,7 @@ class App(ctk.CTk):
 
     # -------------------------------------------------------- Table Rendering
     def _build_schedule_table(self):
-        """Construct the visual grid with Heatmap logic (כולל שני סלוטי בוקר בראשון–שלישי)."""
+        """Construct the visual grid with Heatmap logic."""
         for w in self.table_frame.winfo_children():
             w.destroy()
         self.schedule_menus.clear()
@@ -457,7 +447,7 @@ class App(ctk.CTk):
                 text_color="#1E293B", width=130,
             ).grid(row=0, column=col, padx=3, pady=10)
 
-        for r_idx, (row_label, stype, slot) in enumerate(SCHEDULE_ROW_DEFS):
+        for r_idx, (row_label, stype, slot) in enumerate(schedule_row_defs()):
             row = r_idx + 1
             ctk.CTkLabel(
                 self.table_frame, text=row_label, font=("Calibri", 11, "bold"),
@@ -734,7 +724,7 @@ class App(ctk.CTk):
                 ws.column_dimensions[cell.column_letter].width = 18
 
             excel_row = 2
-            for row_label, stype, slot in SCHEDULE_ROW_DEFS:
+            for row_label, stype, slot in schedule_row_defs():
                 ws.cell(excel_row, 1, row_label).font = Font(bold=True)
                 ws.cell(excel_row, 1).border = border
                 for d in range(data["num_days"]):
